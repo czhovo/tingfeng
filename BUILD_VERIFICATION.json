@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "platform": "Windows x64",
+  "compiler": "g++.exe (GCC) 16.2.0",
+  "source_hashes_verified": 36,
+  "results": [
+    {
+      "version": "v70-parallel-3p3",
+      "budget_seconds": 3.3,
+      "response": "PLAY W1",
+      "exit_reason": "completed_search",
+      "executable_sha256": "57e5d8fa347d7cbcda2544ebff85e676a94d6cdcb41de6128356978df2b1df91",
+      "compile_exit_code": 0,
+      "smoke_exit_code": 0
+    },
+    {
+      "version": "v70-parallel-1p7",
+      "budget_seconds": 1.7,
+      "response": "PLAY W1",
+      "exit_reason": "completed_search",
+      "executable_sha256": "3281ee519651fd5f6c266afcafa63531de1ce41ee56199a80dbc4675fcdfa69e",
+      "compile_exit_code": 0,
+      "smoke_exit_code": 0
+    }
+  ]
+}
