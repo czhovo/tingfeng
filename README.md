@@ -1,34 +1,20 @@
 # 听风 v70
 
-v70-parallel 冻结源码，基于 v67-parallel-soft，支持 schema 2 对手暗手下界信息。两档共用源码，分别编译为 3.3 秒、1.7 秒并行版本，无节点数上限。
+Windows x64 / MinGW-w64 GCC / C++17。两份源码均已内联项目头文件，JSON 依赖随仓库提供。
 
-## 编译
+| 源码 | 默认构建 | 低时限构建 |
+|---|---|---|
+| [v70-parallel.cpp](v70-parallel.cpp) | v70-parallel-3p3 | v70-parallel-1p7 |
+| [v70-hp.cpp](v70-hp.cpp) | v70-hp-5p5 | v70-hp-3p5 |
 
-使用 Windows x64 MinGW-w64 GCC（原版本使用 w64devkit）、C++17 和 PowerShell。JSON 依赖已包含，无需下载。Windows 运行时负责 P 核绑定与 HIGH 进程优先级；本文构建针对 Windows，不承诺 MSVC 或其他平台兼容性。
+在 PowerShell 执行以下命令，仅编译并链接四个程序，输出为 `build/<构建名>.exe`。
 
 ```powershell
 ./build.ps1 -Cxx 'D:/botzone/toolchains/w64devkit/bin/g++.exe'
 ```
 
-也可将 g++ 放入 PATH，直接运行 `./build.ps1`。可用 `-Budget 3p3` 或 `-Budget 1p7` 单独构建。
+g++ 在 PATH 中时可省略 -Cxx。单独构建可传 -Budget 3p3、1p7、5p5 或 3p5。低档分别定义 PARALLEL_LOW_BUDGET 和对应的 TINGFENG_SEARCH_SECONDS（1.70 或 3.50）。
 
-输出：`build/bot-3p3.exe`、`build/bot-1p7.exe`。
+只有 HP 有内存截止。两档共用 CPP 中的 SEARCH_MEMORY_BUDGET_BYTES，默认 24,000,000,000 字节。它基于整个进程的私有提交量及并发分配预留停止搜索；保留最后完整结果，第一层未完成时回退到合法动作。它不是操作系统硬上限，收尾或在途分配可能短暂越线。本次只做编译和静态核对，没有运行引擎。普通版保持冻结版本的策略和时限。
 
-等效命令：
-
-```text
-g++ -std=c++17 -O2 -static -s -pthread -Ithird_party src/bot.cpp -o build/bot-3p3.exe
-g++ -std=c++17 -O2 -static -s -pthread -Ithird_party -DTINGFENG_SEARCH_SECONDS=1.70 -DPARALLEL_LOW_BUDGET src/bot.cpp -o build/bot-1p7.exe
-```
-
-## 输入输出
-
-标准输入每行一份 JSON 请求，标准输出为协议响应；诊断写入标准错误。默认关闭 analyze，`--analyze` 开启诊断，`--workers=1` 可用于固定线程数的复现。默认按可用物理 P 核并行。
-
-```powershell
-Get-Content examples/input.json -Raw | ./build/bot-3p3.exe --workers=1 --analyze
-```
-
-`examples/input.json` 是构造的协议示例。`SOURCE_HASHES.json` 记录原版源码 SHA-256，源码未修改算法。`BUILD_VERIFICATION.json` 记录本次独立代码包的双档编译及冒烟验证。
-
-第三方 `nlohmann/json` 3.12.0 按其头文件中的 MIT 许可提供，保留原始版权和许可声明。
+输入为逐行 JSON，stdout 返回动作，stderr 输出诊断。两系列支持 schema 2 对手暗手下界信息。src、SOURCE_HASHES.json 和 BUILD_VERIFICATION.json 保留原普通版历史记录。第三方 nlohmann/json 3.12.0 的 MIT 许可见其头文件。
